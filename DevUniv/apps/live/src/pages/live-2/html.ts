@@ -1,15 +1,16 @@
-import { flat, pipe, reduce, zip } from '@fxts/core';
+import { flat, map, pipe, reduce, zip } from '@fxts/core';
 
 function tag(strings: any, ...values: unknown[]): void {
   console.log(strings, values);
 }
 
-function html(strings: TemplateStringsArray, ...values: string[]) {
-  values.push('');
-
+function html(strings: TemplateStringsArray, ...values: unknown[]) {
   // zip : 둘씩 하나의 튜플로 만들어주는 함수형 함수
   return pipe(
-    zip(strings, values),
+    zip(
+      strings,
+      map((v) => `${v}`, values),
+    ),
     flat,
     reduce((a, b) => a + b),
   );

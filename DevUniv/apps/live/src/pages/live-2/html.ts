@@ -11,31 +11,48 @@ function* concat(...args: any[]) {
   }
 }
 
-const html = (strings: TemplateStringsArray, ...values: unknown[]) =>
-  // zip : 둘씩 하나의 튜플로 만들어주는 함수형 함수
-  pipe(
-    zip(
-      strings,
-      concat(
-        map((v) => escapeHtml(v), values),
-        [''],
+class Tmpl {
+  constructor(
+    private strings: TemplateStringsArray,
+    private values: unknown[],
+  ) {}
+
+  private _escapeHtml(value: unknown) {
+    return value instanceof Tmpl ? value.toHtml() : escapeHtml(value);
+  }
+
+  toHtml() {
+    return pipe(
+      zip(
+        this.strings,
+        concat(
+          map((v) => this._escapeHtml(v), this.values),
+          [''],
+        ),
       ),
-    ),
-    flat,
-    reduce((a, b) => a + b),
-  );
+      flat,
+      reduce((a, b) => a + b),
+    );
+  }
+}
+
+const html = (strings: TemplateStringsArray, ...values: unknown[]) => new Tmpl(strings, values);
 
 export function main() {
   const a: 'a' = 'a';
   const b: 'b' = 'b';
   const c: 'c' = 'c';
 
-  const result: string = html`
+  const result = html`
     <ul>
-      <li>${a}</li>
-      <li>${b}</li>
-      <li>${c}</li>
+      <div>
+        ${html`
+          <ul>
+            <div></div>
+          </ul>
+        `}
+      </div>
     </ul>
   `;
-  console.log(result);
+  console.log(result.toHtml());
 }

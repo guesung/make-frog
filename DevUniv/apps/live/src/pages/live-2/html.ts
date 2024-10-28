@@ -17,6 +17,10 @@ class Tmpl {
     private values: unknown[],
   ) {}
 
+  private _merge(value: unknown) {
+    return Array.isArray(value) ? value.reduce((a, b) => html`${a}${b}`) : value;
+  }
+
   private _escapeHtml(value: unknown) {
     return value instanceof Tmpl ? value.toHtml() : escapeHtml(value);
   }
@@ -26,7 +30,7 @@ class Tmpl {
       zip(
         this.strings,
         concat(
-          map((v) => this._escapeHtml(v), this.values),
+          map((v) => this._escapeHtml(this._merge(v)), this.values),
           [''],
         ),
       ),
@@ -43,16 +47,13 @@ export function main() {
   const b: 'b' = 'b';
   const c: 'c' = 'c';
 
-  const result = html`
-    <ul>
-      <div>
-        ${html`
-          <ul>
-            <div></div>
-          </ul>
-        `}
-      </div>
-    </ul>
-  `;
+  // result는 Tmpl 인스턴스
+  const result = html`<ul>
+    <li>${a}</li>
+    <li>${b}</li>
+    <li>${c}</li>
+
+    <div>${[a, b, c].map((v) => html`<li>${v}</li>`)}</div>
+  </ul>`;
   console.log(result.toHtml());
 }

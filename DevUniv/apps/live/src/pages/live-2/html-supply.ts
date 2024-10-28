@@ -24,15 +24,9 @@ class HtmlMaker {
 
   toHtml() {
     return pipe(
-      zip(
-        this.strings,
-        concat(
-          map((v) => this._flat(this._merge(v)), this.values),
-          [''],
-        ),
-      ),
+      zip(this.strings, concat(pipe(map(this._merge, this.values), map(this._flat)), [''])),
       flat,
-      reduce((acc, curr) => acc + String(curr)),
+      reduce((acc, cur) => acc + cur),
     );
   }
 }

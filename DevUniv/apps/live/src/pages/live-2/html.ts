@@ -11,6 +11,17 @@ function* concat(...args: any[]) {
   }
 }
 
+const joinTT = <T>(strings: TemplateStringsArray, values: T[], f: (value: T) => string) =>
+  pipe(
+    zip(strings, concat(map(f, values), [''])),
+    flat,
+    reduce((a, b) => a + b),
+  );
+
+function upper(strings, ...values: string[]) {
+  return joinTT(strings, values, (v) => v.toUpperCase());
+}
+
 class Tmpl {
   constructor(
     private strings: TemplateStringsArray,
@@ -26,17 +37,7 @@ class Tmpl {
   }
 
   toHtml() {
-    return pipe(
-      zip(
-        this.strings,
-        concat(
-          map((v) => this._escapeHtml(this._merge(v)), this.values),
-          [''],
-        ),
-      ),
-      flat,
-      reduce((a, b) => a + b),
-    );
+    return joinTT(this.strings, this.values, (v) => this._escapeHtml(this._merge(v)));
   }
 }
 

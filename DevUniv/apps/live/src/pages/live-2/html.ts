@@ -22,6 +22,46 @@ function upper(strings, ...values: string[]) {
   return joinTT(strings, values, (v) => v.toUpperCase());
 }
 
+interface User {
+  name: string;
+  age: number;
+}
+
+abstract class View<T> {
+  constructor(public data: T) {}
+
+  template(data: T) {
+    console.log(1);
+    console.log(this.data, data);
+    return html``;
+  }
+
+  render() {
+    console.log(2);
+    const wrapEl = document.createElement('div');
+    wrapEl.innerHTML = this.template(this.data).toHtml();
+    return wrapEl.children[0];
+  }
+}
+
+class UserView extends View<User[]> {
+  override template(): Tmpl {
+    return html`
+      <div class="users">
+        ${this.data.map(
+          (user) => html`
+            <div class="user">
+              <input type="checkbox" />
+              <span>${user.name}</span>
+              <span>${user.age}</span>
+            </div>
+          `,
+        )}
+      </div>
+    `;
+  }
+}
+
 class Tmpl {
   constructor(
     private strings: TemplateStringsArray,
@@ -57,4 +97,13 @@ export function main() {
     <div>${[a, b, c].map((v) => html`<li>${v}</li>`)}</div>
   </ul>`;
   console.log(result.toHtml());
+
+  const users: User[] = [
+    { name: '박규성', age: 25 },
+    { name: '박규성', age: 20 },
+    { name: '박규성', age: 22 },
+    { name: '박규성', age: 23 },
+  ];
+
+  document.body.append(new UserView(users).render());
 }

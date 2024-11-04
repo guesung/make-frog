@@ -14,6 +14,13 @@ const fn = {
       }, 1000);
     });
   },
+  createUser: function () {
+    console.log("유저 생성");
+
+    return {
+      name: "박규성",
+    };
+  },
 };
 
 module.exports = fn;

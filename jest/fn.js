@@ -6,6 +6,14 @@ const fn = {
       callback(name);
     }, 3000);
   },
+  getAge: function () {
+    const age = 25;
+    return new Promise((resolve) => {
+      return setTimeout(() => {
+        resolve(age);
+      }, 1000);
+    });
+  },
 };
 
 module.exports = fn;

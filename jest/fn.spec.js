@@ -5,12 +5,16 @@ describe("add", () => {
     expect(fn.add(1, 2)).toBe(3);
   });
 
-  test("Mike의 이름을 반환한다", (done) => {
+  test("Mike의 이름을 3초 후에 반환한다.", (done) => {
     const callback = (name) => {
-      expect(name).toBe("Mikes");
+      expect(name).toBe("Mike");
       done();
     };
-
     fn.getName(callback);
+  });
+
+  test("Mike의 나이를 3초 후에 반환한다.", async () => {
+    const age = await fn.getAge();
+    expect(age).toBe(25);
   });
 });

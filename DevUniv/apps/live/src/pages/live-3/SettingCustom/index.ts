@@ -1,4 +1,6 @@
-import { html, View, type Html } from 'rune-ts';
+import { CustomEventWithDetail, html, View, type Html } from 'rune-ts';
+
+class Toggled extends CustomEventWithDetail<{ on: boolean }> {}
 
 class SwitchView extends View<{ on: boolean }> {
   override template() {
@@ -10,12 +12,17 @@ class SwitchView extends View<{ on: boolean }> {
   }
 
   protected override onRender(): void {
-    this.element()?.addEventListener('click', () => this.setOn(!this.data.on));
+    this.addEventListener(Toggled, () => this.#toggle());
   }
 
   setOn(bool: boolean) {
     this.data.on = bool;
-    this.element()?.classList.toggle('on');
+    this.element().classList.toggle('on', bool);
+  }
+
+  #toggle() {
+    this.setOn(!this.data.on);
+    this.dispatchEvent(Toggled, { bubbles: true, detail: this.data });
   }
 }
 
@@ -37,22 +44,51 @@ class SettingItemView extends View<Setting> {
   }
 }
 
+class SettingListView extends View<Setting[]> {
+  switchListView = this.data.map((setting) => new SettingItemView(setting));
+
+  protected override template(): Html {
+    return html` <div>${this.switchListView}</div> `;
+  }
+}
+
 class SettingPage extends View<Setting[]> {
+  #totalSwitch = new SwitchView({ on: false });
+  #listView = new SettingListView(this.data);
+
   protected override template(): Html {
     return html`<div>
       <div class="header">
         <h2>Setting</h2>
-        ${new SwitchView({ on: false })}
+        ${this.#totalSwitch}
       </div>
-      <div class="body">${this.data.map((setting) => new SettingItemView(setting))}</div>
+      <div class="body">${this.#listView}</div>
     </div>`;
+  }
+
+  protected override onRender(): void {
+    this.#totalSwitch.addEventListener(Toggled, (event) => {
+      this.#checkAll(event.detail.on);
+    });
+    this.#listView.addEventListener('toggled', () => {
+      this.#checkAllSwitch();
+    });
+  }
+
+  #checkAll(on) {
+    this.#listView.switchListView.forEach((switchItemView) => switchItemView.switchView.setOn(on));
+  }
+
+  #checkAllSwitch() {
+    const on = this.data.every(({ on }) => on);
+    this.#totalSwitch.setOn(on);
   }
 }
 
 export function main() {
   const settingList: Setting[] = [
     {
-      on: true,
+      on: false,
       title: 'Wifi',
     },
     {

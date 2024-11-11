@@ -47,7 +47,7 @@ abstract class View<T> {
   constructor(public data: T) {}
 
   template(data: T) {
-    return html``;
+    return;
   }
 
   render() {

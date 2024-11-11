@@ -1,5 +1,6 @@
 import { flat, map, pipe, reduce, zip } from '@fxts/core';
 import { escapeHtml } from '../live-2 copy/helper';
+import { main2 } from './html-supply';
 
 function tag(strings: any, ...values: unknown[]): void {
   console.log(strings, values);
@@ -28,37 +29,59 @@ interface User {
 }
 
 abstract class View<T> {
-  constructor(public data: T) {}
+  private _element: HTMLElement | null = null;
 
-  template(data: T) {
-    console.log(1);
-    console.log(this.data, data);
+  constructor(public users: T) {}
+
+  get element() {
+    return this._element;
+  }
+
+  template(users: T) {
     return html``;
   }
 
   render() {
-    console.log(2);
     const wrapEl = document.createElement('div');
-    wrapEl.innerHTML = this.template(this.data).toHtml();
-    return wrapEl.children[0];
+    wrapEl.innerHTML = this.template(this.users).toHtml();
+    this._element = wrapEl.children[0] as HTMLElement;
+    this.onRender();
+    return this._element;
   }
+
+  abstract onRender();
 }
 
-class UserView extends View<User[]> {
+const userHtml = ({ name, age }: User) => html`
+  <div class="user">
+    <input type="checkbox" />
+    <span>${name}</span>
+    <span>${age}</span>
+  </div>
+`;
+
+class UsersView extends View<User[]> {
   override template(): Tmpl {
-    return html`
-      <div class="users">
-        ${this.data.map(
-          (user) => html`
-            <div class="user">
-              <input type="checkbox" />
-              <span>${user.name}</span>
-              <span>${user.age}</span>
-            </div>
-          `,
-        )}
-      </div>
-    `;
+    return html` <div class="users">${this.users.map((user) => userHtml(user))}</div> `;
+  }
+  override onRender() {
+    const $button = document.createElement('button');
+    $button.innerText = '클릭';
+    this.element?.appendChild($button);
+
+    const ages = [1, 2, 3, 4, 5];
+
+    $button.addEventListener('click', () => {
+      ages.forEach((age) => {
+        const $user = html`
+          <div class="user">
+            <input type="checkbox" />
+            <span>${age}</span>
+          </div>
+        `;
+        this.element?.appendChild($user.toHtml());
+      });
+    });
   }
 }
 
@@ -84,19 +107,19 @@ class Tmpl {
 const html = (strings: TemplateStringsArray, ...values: unknown[]) => new Tmpl(strings, values);
 
 export function main() {
-  const a: 'a' = 'a';
-  const b: 'b' = 'b';
-  const c: 'c' = 'c';
+  // const a: 'a' = 'a';
+  // const b: 'b' = 'b';
+  // const c: 'c' = 'c';
 
-  // result는 Tmpl 인스턴스
-  const result = html`<ul>
-    <li>${a}</li>
-    <li>${b}</li>
-    <li>${c}</li>
+  // const result = html`<ul>
+  //   <li>${a}</li>
+  //   <li>${b}</li>
+  //   <li>${c}</li>
 
-    <div>${[a, b, c].map((v) => html`<li>${v}</li>`)}</div>
-  </ul>`;
-  console.log(result.toHtml());
+  //   <div>${[a, b, c].map((v) => html`<li>${v}</li>`)}</div>
+
+  //   <li>${html` <ul></ul>`}</li>
+  // </ul>`;
 
   const users: User[] = [
     { name: '박규성', age: 25 },
@@ -105,5 +128,6 @@ export function main() {
     { name: '박규성', age: 23 },
   ];
 
-  document.body.append(new UserView(users).render());
+  document.body.append(new UsersView(users).render());
+  // main2();
 }

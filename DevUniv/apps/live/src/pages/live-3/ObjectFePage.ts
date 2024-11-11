@@ -1,6 +1,8 @@
 import { html, Page } from 'rune-ts';
-import { main as loadSetting } from './Setting';
-import { main as loadTodo } from './Todo';
+// import { main as loadSetting } from './Setting';
+import { main as loadSetting } from './SettingCustom';
+
+// import { main as loadTodo } from './Todo';
 
 export class ObjectFePage extends Page<object> {
   override template() {
@@ -8,8 +10,8 @@ export class ObjectFePage extends Page<object> {
   }
 
   override onRender() {
-    loadTodo();
+    // loadTodo();
     loadSetting();
-    this.element().remove();
+    // this.element().remove();
   }
 }

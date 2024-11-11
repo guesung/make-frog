@@ -47,9 +47,6 @@ abstract class View<T> {
   render() {
     const wrapperElement = document.createElement('div');
     wrapperElement.innerHTML = this.template(this.users).toHtml();
-    console.log(this.template(this.users));
-    console.log(this.template(this.users).toHtml());
-    console.log(wrapperElement);
     return wrapperElement.children[0];
   }
 }

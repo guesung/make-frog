@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
-    "module": "CommonJS"
+    "module": "CommonJS" // TS -> JS를 컴파일할 때 CJS 방식으로 컴파일한다. 즉, require,export문을 사용한다.
+    // 이를 실행하기 위해서는 package.json > type을 commonjs로 설정해야한다. (기본값)
   }
 }

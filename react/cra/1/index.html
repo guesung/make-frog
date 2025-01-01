@@ -1,0 +1,22 @@
+<div id="root"></div>
+
+<script type="module">
+  import * as React from "https://esm.sh/react";
+  import * as ReactDOM from "https://esm.sh/react-dom/client";
+
+  const list = React.createElement(
+    "ui",
+    { className: "list" },
+    React.createElement("li", { className: "item" }, "1번"),
+    React.createElement("li", { className: "item" }, "2번"),
+    React.createElement("li", { className: "item" }, "3번")
+  );
+
+  const container = React.createElement(
+    "div",
+    { className: "container" },
+    list
+  );
+
+  ReactDOM.createRoot(document.getElementById("root")).render(container);
+</script>
